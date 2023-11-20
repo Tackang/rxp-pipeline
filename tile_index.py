@@ -29,8 +29,7 @@ def tile_index(ply, args):
     JSON = pipeline.metadata
     X = JSON['metadata']['filters.stats']['statistic'][0]['average']
     Y = JSON['metadata']['filters.stats']['statistic'][1]['average']
-    T = int(os.path.split(ply)[1].split('.')[0])
-    
+    T = int(os.path.split(ply)[1].split('.')[0])    
     with args.Lock:
         
         with open(args.tile_index, 'a') as fh:
@@ -44,10 +43,11 @@ if __name__ == '__main__':
     parser.add_argument('--num-prcs', type=int, default=10, help='number of cores to use')
     parser.add_argument('--verbose', action='store_true', help='print something')
     args = parser.parse_args()
-
+    ply_files = glob.glob(os.path.join(args.pc[0], '*.ply'))
     m = multiprocessing.Manager()
     args.Lock = m.Lock()
     pool = multiprocessing.Pool(args.num_prcs)
-    pool.starmap_async(tile_index, [(ply, args) for ply in args.pc])
+    pool.starmap_async(tile_index, [(ply, args) for ply in ply_files])
     pool.close()
     pool.join() 
+
